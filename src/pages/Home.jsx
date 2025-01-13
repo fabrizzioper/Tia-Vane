@@ -1,22 +1,10 @@
 import React from "react";
-import Header from "../components/layout/Header";
+import MainLayout from "../components/layout/MainLayout";
 import ProductSlider from "../components/home/ProductSlider";
 import HeroSection from "../components/home/HeroSection";
+import ImageCarousel from "../components/home/ImageCarousel";
 import imagen from "../assets/imagen.png";
 import imagen2 from "../assets/imagen2.jpg";
-import imagen3 from "../assets/imagen3.png";
-import ImageCarousel from "../components/home/ImageCarousel";
-
-const logo = "/api/placeholder/48/48";
-
-const menuItems = [
-  { label: "Lo nuevo", href: "#" },
-  { label: "Hombre", href: "#" },
-  { label: "Mujer", href: "#" },
-  { label: "Niños", href: "#" },
-  { label: "Accesorios", href: "#" },
-  { label: "Ofertas⚡️", href: "#" },
-];
 
 const products = [
   { id: 1, name: "Pegasus", image: imagen },
@@ -38,14 +26,11 @@ const heroContent = {
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-white">
-      <Header logo={logo} menuItems={menuItems} />
-      <main className="max-w-[1800px] mx-auto px-8">
-        <HeroSection {...heroContent} />
-        <ProductSlider products={products} title={"Novedades"} />
-        <ImageCarousel products={products} title="Siempre Icónico" />
-      </main>
-    </div>
+    <MainLayout>
+      <HeroSection {...heroContent} />
+      <ProductSlider products={products} title={"Novedades"} />
+      <ImageCarousel products={products} title="Siempre Icónico" />
+    </MainLayout>
   );
 };
 

@@ -3,28 +3,45 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropTypes from "prop-types";
 
 const ImageCarousel = ({ products, title }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(products.length);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [imageWidth, setImageWidth] = useState(0);
+  const [visibleSlides, setVisibleSlides] = useState(5);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
   const carouselRef = useRef(null);
-  const visibleSlides = 5; 
+  const dragStartX = useRef(0);
+  const currentTranslateX = useRef(0);
   const gap = 10;
   const extendedSlides = [...products, ...products, ...products];
 
+  const updateLayout = () => {
+    if (window.innerWidth <= 768) {
+      setVisibleSlides(1);
+      setIsMobile(true);
+    } else {
+      setVisibleSlides(5);
+      setIsMobile(false);
+    }
+  };
+
   useEffect(() => {
-    // Calcular dinámicamente el ancho de cada imagen al montar
+    updateLayout();
+    window.addEventListener("resize", updateLayout);
+    return () => window.removeEventListener("resize", updateLayout);
+  }, []);
+
+  useEffect(() => {
     const calculateImageWidth = () => {
       if (carouselRef.current) {
-        const totalWidth = carouselRef.current.offsetWidth; // Ancho total del carrusel
-        const adjustedWidth =
-          (totalWidth - gap * (visibleSlides - 1)) / visibleSlides;
+        const totalWidth = carouselRef.current.offsetWidth;
+        const adjustedWidth = (totalWidth - gap * (visibleSlides - 1)) / visibleSlides;
         setImageWidth(adjustedWidth);
       }
     };
 
     calculateImageWidth();
-
-    // Recalcular en caso de redimensionar la ventana
     window.addEventListener("resize", calculateImageWidth);
     return () => window.removeEventListener("resize", calculateImageWidth);
   }, [gap, visibleSlides]);
@@ -33,10 +50,11 @@ const ImageCarousel = ({ products, title }) => {
     if (isTransitioning) {
       const timer = setTimeout(() => {
         setIsTransitioning(false);
+        // Ajustar la posición sin transición visual cuando llegamos a los extremos
         if (currentIndex >= products.length * 2) {
-          setCurrentIndex(currentIndex - products.length);
+          setCurrentIndex(products.length);
         } else if (currentIndex < products.length) {
-          setCurrentIndex(currentIndex + products.length);
+          setCurrentIndex(products.length * 2 - 1);
         }
       }, 500);
 
@@ -44,18 +62,42 @@ const ImageCarousel = ({ products, title }) => {
     }
   }, [currentIndex, isTransitioning, products.length]);
 
-  const nextSlide = () => {
-    if (!isTransitioning) {
-      setIsTransitioning(true);
-      setCurrentIndex((prev) => prev + 1);
+  const handleDragStart = (e) => {
+    setIsDragging(true);
+    dragStartX.current = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+    currentTranslateX.current = -currentIndex * (imageWidth + gap);
+    
+    if (e.type === 'mousedown') {
+      e.preventDefault();
     }
   };
 
-  const prevSlide = () => {
-    if (!isTransitioning) {
-      setIsTransitioning(true);
-      setCurrentIndex((prev) => prev - 1);
+  const handleDragMove = (e) => {
+    if (!isDragging) return;
+    
+    const currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+    const diff = currentX - dragStartX.current;
+    setDragOffset(diff);
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+    
+    setIsDragging(false);
+    const moveThreshold = imageWidth / 4;
+    
+    if (Math.abs(dragOffset) > moveThreshold) {
+      if (dragOffset > 0) {
+        setIsTransitioning(true);
+        setCurrentIndex(prev => prev - 1);
+      } else {
+        setIsTransitioning(true);
+        setCurrentIndex(prev => prev + 1);
+      }
     }
+    
+    setIsTransitioning(true);
+    setDragOffset(0);
   };
 
   const isCenterSlide = (index) => {
@@ -71,25 +113,34 @@ const ImageCarousel = ({ products, title }) => {
 
       <div className="relative w-full">
         <div className="flex items-center justify-between">
-          <button
-            onClick={prevSlide}
-            className="absolute left-12 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white hover:bg-white/90 transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6 text-black" />
-          </button>
+          {!isMobile && (
+            <button
+              onClick={() => {
+                setIsTransitioning(true);
+                setCurrentIndex(prev => prev - 1);
+              }}
+              className="absolute left-12 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white hover:bg-white/90 transition-colors"
+            >
+              <ChevronLeft className="w-6 h-6 text-black" />
+            </button>
+          )}
 
-          <div className="w-full overflow-hidden">
+          <div 
+            className="w-full overflow-hidden"
+            onMouseDown={isMobile ? handleDragStart : null}
+            onMouseMove={isMobile ? handleDragMove : null}
+            onMouseUp={isMobile ? handleDragEnd : null}
+            onMouseLeave={isMobile ? handleDragEnd : null}
+            onTouchStart={isMobile ? handleDragStart : null}
+            onTouchMove={isMobile ? handleDragMove : null}
+            onTouchEnd={isMobile ? handleDragEnd : null}
+          >
             <div
-              className={`flex ${
-                isTransitioning
-                  ? "transition-transform duration-500 ease-out"
-                  : "transition-none"
-              }`}
+              className={`flex ${(isTransitioning || !isDragging) ? "transition-transform duration-500 ease-out" : ""}`}
               style={{
-                transform: `translateX(calc(-${currentIndex} * (${
-                  imageWidth + gap
-                }px)))`,
+                transform: `translateX(calc(${-currentIndex * (imageWidth + gap)}px + ${dragOffset}px))`,
                 gap: `${gap}px`,
+                transition: isTransitioning ? 'transform 500ms ease-out' : 'none'
               }}
             >
               {extendedSlides.map((slide, index) => (
@@ -97,24 +148,23 @@ const ImageCarousel = ({ products, title }) => {
                   key={index}
                   className="relative flex-shrink-0"
                   style={{
-                    width: `${imageWidth}px`, // Ancho dinámico
+                    width: `${imageWidth}px`,
                   }}
                 >
-                  {/* Números en la parte superior derecha */}
                   {isCenterSlide(index - currentIndex) && (
-                    <div className="absolute top-2 right-2 text-white text-md  bg-black bg-opacity-50 px-2 py-1 rounded">
+                    <div className="absolute top-2 right-2 text-white text-md bg-black bg-opacity-50 px-2 py-1 rounded">
                       {((slide.id - 1) % products.length) + 1}/{products.length}
                     </div>
                   )}
                   <img
                     src={slide.image}
                     alt={`Nike ${slide.name}`}
-                    className="w-full h-auto bg-black"
+                    className="w-full h-auto bg-black select-none"
                     style={{
-                      objectFit: "contain", // Mantener proporción
+                      objectFit: "contain",
                     }}
+                    draggable="false"
                   />
-                  {/* Nombre del producto debajo */}
                   {isCenterSlide(index - currentIndex) && (
                     <p className="text-gray-500 text-start mt-4 font-bold text-lg">
                       {slide.name}
@@ -125,12 +175,17 @@ const ImageCarousel = ({ products, title }) => {
             </div>
           </div>
 
-          <button
-            onClick={nextSlide}
-            className="absolute right-12 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white hover:bg-white/90 transition-colors"
-          >
-            <ChevronRight className="w-6 h-6 text-black" />
-          </button>
+          {!isMobile && (
+            <button
+              onClick={() => {
+                setIsTransitioning(true);
+                setCurrentIndex(prev => prev + 1);
+              }}
+              className="absolute right-12 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white hover:bg-white/90 transition-colors"
+            >
+              <ChevronRight className="w-6 h-6 text-black" />
+            </button>
+          )}
         </div>
       </div>
     </section>
