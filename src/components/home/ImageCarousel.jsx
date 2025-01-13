@@ -2,16 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropTypes from "prop-types";
 
-const ImageCarousel = ({ slides, title }) => {
+const ImageCarousel = ({ products, title }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [imageWidth, setImageWidth] = useState(0);
   const carouselRef = useRef(null);
-
-  const visibleSlides = 5; // Número de imágenes visibles
-  const gap = 10; // Espacio entre imágenes
-
-  const extendedSlides = [...slides, ...slides, ...slides];
+  const visibleSlides = 5; 
+  const gap = 10;
+  const extendedSlides = [...products, ...products, ...products];
 
   useEffect(() => {
     // Calcular dinámicamente el ancho de cada imagen al montar
@@ -35,16 +33,16 @@ const ImageCarousel = ({ slides, title }) => {
     if (isTransitioning) {
       const timer = setTimeout(() => {
         setIsTransitioning(false);
-        if (currentIndex >= slides.length * 2) {
-          setCurrentIndex(currentIndex - slides.length);
-        } else if (currentIndex < slides.length) {
-          setCurrentIndex(currentIndex + slides.length);
+        if (currentIndex >= products.length * 2) {
+          setCurrentIndex(currentIndex - products.length);
+        } else if (currentIndex < products.length) {
+          setCurrentIndex(currentIndex + products.length);
         }
       }, 500);
 
       return () => clearTimeout(timer);
     }
-  }, [currentIndex, isTransitioning, slides.length]);
+  }, [currentIndex, isTransitioning, products.length]);
 
   const nextSlide = () => {
     if (!isTransitioning) {
@@ -105,7 +103,7 @@ const ImageCarousel = ({ slides, title }) => {
                   {/* Números en la parte superior derecha */}
                   {isCenterSlide(index - currentIndex) && (
                     <div className="absolute top-2 right-2 text-white text-md  bg-black bg-opacity-50 px-2 py-1 rounded">
-                      {((slide.id - 1) % slides.length) + 1}/{slides.length}
+                      {((slide.id - 1) % products.length) + 1}/{products.length}
                     </div>
                   )}
                   <img
@@ -140,7 +138,7 @@ const ImageCarousel = ({ slides, title }) => {
 };
 
 ImageCarousel.propTypes = {
-  slides: PropTypes.arrayOf(
+  products: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,

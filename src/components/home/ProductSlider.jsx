@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const ProductSlider = ({ products }) => {
+const ProductSlider = ({ products, title }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 1 : 3);
   const [gapClass, setGapClass] = useState(window.innerWidth < 768 ? '' : 'gap-4');
@@ -43,7 +44,7 @@ const ProductSlider = ({ products }) => {
     <section className="mb-16 w-full">
       {/* Header con título y navegación */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Novedades</h2>
+        <h2 className="text-2xl font-bold">{title}</h2>
         <div className="flex gap-2">
           <button
             onClick={prevSlide}
@@ -94,6 +95,18 @@ const ProductSlider = ({ products }) => {
       </div>
     </section>
   );
+};
+
+// Validaciones con PropTypes
+ProductSlider.propTypes = {
+  products: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      image: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  title: PropTypes.string.isRequired,
 };
 
 export default ProductSlider;
