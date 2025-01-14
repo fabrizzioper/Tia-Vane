@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const HeroSection = ({ firstImage, secondImage, title, subtitle, buttons }) => {
   return (
@@ -36,7 +36,8 @@ const HeroSection = ({ firstImage, secondImage, title, subtitle, buttons }) => {
             </div>
           </div>
         </div>
-
+      </div>
+      <div className="flex flex-col items-start md:items-center">
         {/* Texto centrado */}
         <div className="text-start md:text-center mt-8 mb-12">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-snug mb-4">
@@ -45,7 +46,7 @@ const HeroSection = ({ firstImage, secondImage, title, subtitle, buttons }) => {
           <p className="text-lg md:text-xl text-gray-600 tracking-wide leading-relaxed mb-8">
             {subtitle}
           </p>
-          
+
           {/* Botones dinámicos */}
           {buttons && buttons.length > 0 && (
             <div className="flex gap-4 justify-start md:justify-center">
