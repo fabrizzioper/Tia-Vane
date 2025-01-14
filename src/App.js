@@ -1,13 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
+import Sale from "./pages/Sale";
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* Aquí puedes añadir más rutas como Productos o Contacto */}
+        <Route path="/sale" element={<Sale />} />
       </Routes>
     </Router>
   );
