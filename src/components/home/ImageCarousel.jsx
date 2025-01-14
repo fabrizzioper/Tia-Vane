@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropTypes from "prop-types";
 
@@ -10,11 +10,15 @@ const ImageCarousel = ({ products, title }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
+  const [imageHeight, setImageHeight] = useState(0); // Estado para almacenar la altura de la imagen
   const carouselRef = useRef(null);
   const dragStartX = useRef(0);
   const currentTranslateX = useRef(0);
   const gap = 10;
   const extendedSlides = [...products, ...products, ...products];
+  
+  // Ref para la imagen actual
+  const currentImageRef = useRef(null);
 
   const updateLayout = () => {
     if (window.innerWidth <= 768) {
@@ -105,21 +109,46 @@ const ImageCarousel = ({ products, title }) => {
     return index % visibleSlides === middlePosition;
   };
 
+  // Función para actualizar la altura de la imagen actual
+  const updateImageHeight = useCallback(() => {
+    if (currentImageRef.current) {
+      setImageHeight(currentImageRef.current.clientHeight);
+    }
+  }, []);
+
+  // Actualizar la altura cuando cambia el índice actual o el ancho de la imagen
+  useEffect(() => {
+    updateImageHeight();
+  }, [currentIndex, imageWidth, updateImageHeight]);
+
+  // Actualizar la altura cuando la ventana cambia de tamaño
+  useEffect(() => {
+    window.addEventListener("resize", updateImageHeight);
+    return () => window.removeEventListener("resize", updateImageHeight);
+  }, [updateImageHeight]);
+
   return (
     <section className="mb-16 w-full" ref={carouselRef}>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">{title}</h2>
       </div>
 
+      {/* Contenedor relativo */}
       <div className="relative w-full">
         <div className="flex items-center justify-between">
+          
+          {/* Botón izquierdo */}
           {!isMobile && (
             <button
               onClick={() => {
                 setIsTransitioning(true);
                 setCurrentIndex(prev => prev - 1);
               }}
-              className="absolute left-12 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white hover:bg-white/90 transition-colors"
+              className="absolute left-12 z-10 p-2 rounded-full bg-white hover:bg-white/90 transition-colors"
+              style={{
+                top: `${imageHeight / 2}px`,
+                transform: 'translateY(-50%)',
+              }}
             >
               <ChevronLeft className="w-6 h-6 text-black" />
             </button>
@@ -157,6 +186,7 @@ const ImageCarousel = ({ products, title }) => {
                     </div>
                   )}
                   <img
+                    ref={isCenterSlide(index - currentIndex) ? currentImageRef : null}
                     src={slide.image}
                     alt={`Nike ${slide.name}`}
                     className="w-full h-auto bg-black select-none"
@@ -164,6 +194,7 @@ const ImageCarousel = ({ products, title }) => {
                       objectFit: "contain",
                     }}
                     draggable="false"
+                    onLoad={updateImageHeight} // Asegurar que la altura se actualiza al cargar la imagen
                   />
                   {isCenterSlide(index - currentIndex) && (
                     <p className="text-gray-500 text-start mt-4 font-bold text-lg">
@@ -175,13 +206,18 @@ const ImageCarousel = ({ products, title }) => {
             </div>
           </div>
 
+          {/* Botón derecho */}
           {!isMobile && (
             <button
               onClick={() => {
                 setIsTransitioning(true);
                 setCurrentIndex(prev => prev + 1);
               }}
-              className="absolute right-12 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white hover:bg-white/90 transition-colors"
+              className="absolute right-12 z-10 p-2 rounded-full bg-white hover:bg-white/90 transition-colors"
+              style={{
+                top: `${imageHeight / 2}px`,
+                transform: 'translateY(-50%)',
+              }}
             >
               <ChevronRight className="w-6 h-6 text-black" />
             </button>
