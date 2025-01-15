@@ -21,7 +21,7 @@ const Sale = () => {
     },
     {
       id: 2,
-      name: "Jordan",
+      name: "blazer",
       description: "Mochila (mediana)",
       price: 129.90,
       currency: "S/",
@@ -30,7 +30,7 @@ const Sale = () => {
     },
     {
       id: 3,
-      name: "Dunk",
+      name: "blazer",
       description: "Mochila (mediana)",
       price: 129.90,
       currency: "S/",

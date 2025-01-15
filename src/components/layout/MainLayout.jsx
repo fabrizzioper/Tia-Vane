@@ -18,7 +18,7 @@ const MainLayout = ({ children, onSearch }) => {
       {/* Pasamos onSearch al Header */}
       <Header logo={logo} menuItems={menuItems} onSearch={onSearch} />
 
-      <main className="max-w-[1800px] mx-auto px-8">{children}</main>
+      <main className="max-w-[1800px] mx-auto px-8 md:px-24 lg:px-28 ">{children}</main>
 
       <Footer quickLinks={menuItems} />
     </div>

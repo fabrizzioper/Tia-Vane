@@ -3,15 +3,18 @@ import { Heart } from "lucide-react";
 
 const ProductCard = ({ products }) => {
   return (
-    <div className="container mx-auto py-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+    <div className="w-full py-6"> 
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
         {products.map((product) => (
-          <div key={product.id} className="max-w-sm overflow-hidden bg-white">
+          <div 
+            key={product.id} 
+            className="overflow-hidden bg-white" 
+          >
             <div className="relative">
               <img
                 src={product.imageUrl}
                 alt={`${product.name} - ${product.description}`}
-                className="w-full h-80 object-cover bg-gray-100"
+                className="w-full h-full object-cover bg-gray-100"
               />
               <button
                 className="absolute top-4 right-4 p-1 rounded-full bg-white/80 hover:bg-white transition-colors"

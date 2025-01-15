@@ -10,7 +10,7 @@ const Footer = ({ quickLinks }) => {
 
   return (
     <footer className="bg-black text-white font-sans pt-12 pb-6">
-      <div className="max-w-[1800px] mx-auto px-8 text-sm">
+      <div className="max-w-[1800px] mx-auto px-8 md:px-24 lg:px-28 text-sm">
         <div className="grid grid-cols-1 lg:grid-cols-[300px_300px_300px_1fr] gap-8 lg:gap-12">
           {/* Primera Columna - Información Básica */}
           <div className="space-y-4">
