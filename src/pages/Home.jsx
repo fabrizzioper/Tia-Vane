@@ -28,7 +28,7 @@ const Home = () => {
   return (
     <MainLayout>
       <HeroSection {...heroContent} />
-      <ProductSlider products={products} title={"Novedades"} />
+      <ProductSlider products={products} title="Novedades" />
       <ImageCarousel products={products} title="Siempre Icónico" />
     </MainLayout>
   );
